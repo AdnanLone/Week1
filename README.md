@@ -5,10 +5,15 @@ User Stories
 The following required functionality is complete:
 
 [✓] Settings page to change the default tip percentage
+
 [✓] User can view a list of movies currently playing in theaters from The Movie Database.
+
 [✓] Poster images are loaded using the UIImageView category in the AFNetworking library.
+
 [✓] The movie poster is available by appending the returned poster_path to https://image.tmdb.org/t/p/w342.
+
 [✓] User sees a loading state while waiting for the movies API (you can use any 3rd party library available to do this).
+
 [✓] User can pull to refresh the movie list.
 
 
