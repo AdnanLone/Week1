@@ -25,12 +25,11 @@ The following user stories are optional:
 
 Here's a walkthrough of implemented user stories:
 
-NEW
+
 <img src='http://i.imgur.com/1S4UtTM.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 
-OLD
-<img src='http://i.imgur.com/6qKTkJO.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
