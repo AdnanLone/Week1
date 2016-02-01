@@ -4,7 +4,6 @@ User Stories
 
 The following required functionality is complete:
 
-[✓] Settings page to change the default tip percentage
 
 [✓] User can view a list of movies currently playing in theaters from The Movie Database.
 
