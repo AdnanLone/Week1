@@ -15,6 +15,11 @@ The following required functionality is complete:
 
 [✓] User can pull to refresh the movie list.
 
+The following user stories are optional:
+
+[✓] User can search for a movie.
+
+
 
 ## Video Walkthrough 
 
