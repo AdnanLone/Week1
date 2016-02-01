@@ -8,29 +8,129 @@
 
 import UIKit
 import AFNetworking
+import MBProgressHUD
 
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
+
+
+class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
+
+    @IBOutlet weak var searchBar: UISearchBar!
+    
     @IBOutlet weak var tableView: UITableView!
     
+    @IBOutlet weak var errorLabel: UILabel!
+    
     var movies: [NSDictionary]?
+    var searchedMovies: [NSDictionary]?
     
     override func viewDidLoad() {
         super.viewDidLoad()
+     
         
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: "refreshControlAction:", forControlEvents: .ValueChanged)
+        tableView.insertSubview(refreshControl, atIndex: 0)
+        
+        searchBar.delegate = self
         tableView.dataSource = self
         tableView.delegate = self
-
-        // Do any additional setup after loading the view.
         
         let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
         let url = NSURL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
-        let request = NSURLRequest(
-            URL: url!,
-            cachePolicy: NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData,
-            timeoutInterval: 10)
+        let request = NSURLRequest(URL: url!)
+        let session = NSURLSession(
+            configuration: NSURLSessionConfiguration.defaultSessionConfiguration(),
+            delegate: nil,
+            delegateQueue: NSOperationQueue.mainQueue()
+        )
         
+        //Start loading icon
+        MBProgressHUD.showHUDAddedTo(self.view, animated: true)
+        
+        let task: NSURLSessionDataTask = session.dataTaskWithRequest(request,
+            completionHandler: { (dataOrNil, response, error) in
+                if let data = dataOrNil {
+                    if let responseDictionary = try! NSJSONSerialization.JSONObjectWithData(
+                        data, options:[]) as? NSDictionary {
+                            
+                            self.movies = responseDictionary["results"] as? [NSDictionary]
+                            self.searchedMovies = self.movies
+                            self.tableView.reloadData()
+                            self.errorLabel.hidden = true
+                            
+                    }
+                }
+                else {
+                    self.errorLabel.hidden = false
+                }
+                
+                MBProgressHUD.hideHUDForView(self.view, animated: true)
+                
+                
+        });
+        task.resume()
+        
+        
+        // Do any additional setup after loading the view.
+        //using the search bar to find movies
+        
+        searchBar.text = ""
+        searchBar.showsCancelButton = false
+        searchBar.resignFirstResponder()
+        findMovie("")
+
+    }
+    
+    
+    func findMovie(searchText: String) {
+        
+        if let movies = movies {
+            
+            searchedMovies = searchText.isEmpty ? movies : movies.filter(
+                {
+                    (movie: NSDictionary) -> Bool in
+                    let title = movie["title"] as! String
+                    return title.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil
+            })
+        }
+        else {
+            searchedMovies = nil
+        }
+        tableView.reloadData()
+    }
+    
+    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        findMovie(searchText)
+    }
+    
+    func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
+        searchBar.showsCancelButton = true
+    }
+    
+    func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+        searchBar.showsCancelButton = false
+        searchBar.text = ""
+        searchBar.resignFirstResponder()
+        
+        findMovie("")
+    }
+    
+    func searchBarSearchButtonClicked(searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+    }
+
+    
+    
+    
+    
+    func refreshControlAction(refreshControl: UIRefreshControl) {
+        
+        let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
+        let url = NSURL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
+        let request = NSURLRequest(URL: url!)
         let session = NSURLSession(
             configuration: NSURLSessionConfiguration.defaultSessionConfiguration(),
             delegate: nil,
@@ -42,15 +142,22 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                 if let data = dataOrNil {
                     if let responseDictionary = try! NSJSONSerialization.JSONObjectWithData(
                         data, options:[]) as? NSDictionary {
-                            print("response: \(responseDictionary)")
                             
-                            self.movies = responseDictionary["results"] as! [NSDictionary]
+                            
+                            self.movies = responseDictionary["results"] as? [NSDictionary]
                             
                             self.tableView.reloadData()
+                            self.errorLabel.hidden = true
                     }
                 }
-        })
+                else {
+                    self.errorLabel.hidden = false
+                }
+                
+                refreshControl.endRefreshing()
+        });
         task.resume()
+    
     }
 
     override func didReceiveMemoryWarning() {
@@ -59,10 +166,11 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     public func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int{
-        if let movies = movies {
-            return movies.count
-        }else {
-        return 0
+        
+        if let searchedMovies = searchedMovies {
+            return searchedMovies.count
+        } else {
+            return 0
         }
         
     }
@@ -70,7 +178,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     public func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("MovieCell", forIndexPath: indexPath) as! MovieCell
         
-        let movie = movies![indexPath.row]
+        let movie = searchedMovies![indexPath.row]
         let title = movie["title"] as! String
         let overview = movie["overview"] as! String
         let baseUrl = "http://image.tmdb.org/t/p/w500"
@@ -87,6 +195,10 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         return cell
     }
 
+
+    
+    
+    
     /*
     // MARK: - Navigation
 
