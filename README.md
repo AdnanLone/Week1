@@ -4,7 +4,6 @@ User Stories
 
 The following required functionality is complete:
 
-[✓] Settings page to change the default tip percentage
 
 [✓] User can view a list of movies currently playing in theaters from The Movie Database.
 
@@ -16,12 +15,21 @@ The following required functionality is complete:
 
 [✓] User can pull to refresh the movie list.
 
+The following user stories are optional:
+
+[✓] User can search for a movie.
+
+
 
 ## Video Walkthrough 
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/6qKTkJO.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+
+<img src='http://i.imgur.com/1S4UtTM.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+
+
+
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
